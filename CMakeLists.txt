@@ -5,7 +5,9 @@ project(
     LANGUAGES C CXX
 )
 
-find_package(OpenGL)
+find_package(OpenGL REQUIRED)
+find_package(PkgConfig REQUIRED)
+pkg_search_module(GLFW REQUIRED glfw3)
 
 set(SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
 set(IMGUI_SOURCE_DIR ${CMAKE_SOURCE_DIR}/imgui)
@@ -13,7 +15,6 @@ set(IMGUI_BACKENDS_DIR ${IMGUI_SOURCE_DIR}/backends)
 set(IMGUI_MISC_CPP_DIR ${IMGUI_SOURCE_DIR}/misc/cpp)
 
 set(IMGUI_LIBS_DIR ${IMGUI_SOURCE_DIR}/examples/libs)
-set(GLFW_LIB ${IMGUI_LIBS_DIR}/glfw/lib-vc2010-64)
 set(GLFW_INCLUDE_DIR ${IMGUI_LIBS_DIR}/glfw/include)
 
 set(GLM_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/glm)
@@ -51,19 +52,23 @@ target_include_directories(
     ${IMGUI_MISC_CPP_DIR}
     ${IMGUI_BACKENDS_DIR}
     ${GLFW_INCLUDE_DIR}
+    ${GLFW_INCLUDE_DIRS}
     ${GLM_INCLUDE_DIR}
     happly
 )
 
 target_link_libraries(
     Imgui3DViewer
-    ${GLFW_LIB}/glfw3.lib
+    ${GLFW_LIBRARIES}
     OpenGL::GL
 )
 
 add_custom_command(
     TARGET Imgui3DViewer POST_BUILD
-    COMMAND
-        ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/sample/bunny.ply ${CMAKE_BINARY_DIR}/Debug/ &
-        ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/sample/bunny.ply ${CMAKE_BINARY_DIR}/Release/ &
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/Debug
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/Release
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/sample/bunny.ply ${CMAKE_BINARY_DIR}/Debug/
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/sample/bunny.ply ${CMAKE_BINARY_DIR}/
 )
+
+
